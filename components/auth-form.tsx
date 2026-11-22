@@ -36,8 +36,10 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
           setError('Choose a password with at least 8 characters.')
         } else if (code.includes('INVALID_EMAIL')) {
           setError('Enter a valid email address.')
-        } else if (status === 403 || code.includes('ORIGIN')) {
-          setError('Sign-up is blocked for this app origin. Please try again from the app preview.')
+        } else if (code.includes('ORIGIN')) {
+          setError('Sign-up is blocked for this app origin. Please open the current app preview and try again.')
+        } else if (status === 403) {
+          setError(`The app rejected this request (${code || status}). Open the current preview and try again.`)
         } else if (status >= 500) {
           setError(`The account service returned an error (${code || status}). Please retry; if it continues, share this code.`)
         } else {
