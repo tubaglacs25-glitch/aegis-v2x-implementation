@@ -25,7 +25,24 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
         ? await authClient.signUp.email({ email: email.trim(), password, name: name.trim() })
         : await authClient.signIn.email({ email: email.trim(), password })
       if (result.error) {
-        setError(isSignUp ? 'Could not create your account. Check the details, or sign in if you already registered.' : 'We couldn’t sign in with those details. If this is your first visit, create an account below; otherwise check your email and password.')
+        const code = result.error.code?.toUpperCase() ?? ''
+        const status = result.error.status
+
+        if (!isSignUp) {
+          setError('We couldn’t sign in with those details. If this is your first visit, create an account below; otherwise check your email and password.')
+        } else if (code.includes('USER_ALREADY_EXISTS')) {
+          setError('This email is already registered. Please sign in instead.')
+        } else if (code.includes('PASSWORD_TOO_SHORT')) {
+          setError('Choose a password with at least 8 characters.')
+        } else if (code.includes('INVALID_EMAIL')) {
+          setError('Enter a valid email address.')
+        } else if (status === 403 || code.includes('ORIGIN')) {
+          setError('Sign-up is blocked for this app origin. Please try again from the app preview.')
+        } else if (status >= 500) {
+          setError(`The account service returned an error (${code || status}). Please retry; if it continues, share this code.`)
+        } else {
+          setError(`Account creation was rejected (${code || status}). Check your details and try again.`)
+        }
         return
       }
       router.replace('/')
@@ -50,7 +67,7 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
           {isSignUp && <label className="auth-field"><span>Full name</span><input value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" required maxLength={80} placeholder="Your name" /></label>}
           <label className="auth-field"><span>Email address</span><input type="email" value={email} onChange={(event) => setEmail(event.target.value)} autoComplete="email" required maxLength={254} placeholder="you@company.com" /></label>
           <label className="auth-field"><span>Password</span><span className="auth-password-control"><input type={showPassword ? 'text' : 'password'} value={password} onChange={(event) => setPassword(event.target.value)} autoComplete={isSignUp ? 'new-password' : 'current-password'} minLength={isSignUp ? 8 : undefined} maxLength={128} required placeholder={isSignUp ? 'At least 8 characters' : 'Enter your password'} /><button className="auth-password-toggle" type="button" onClick={() => setShowPassword((visible) => !visible)} aria-label={showPassword ? 'Hide password' : 'Show password'} aria-pressed={showPassword}>{showPassword ? <EyeOff size={16} /> : <Eye size={16} />}</button></span></label>
-          {error && <div className="auth-error" role="alert"><span>{isSignUp ? 'Could not create the account. If you already registered, sign in instead.' : error}</span>{isSignUp && <Link href="/sign-in">Sign in</Link>}</div>}
+          {error && <div className="auth-error" role="alert"><span>{error}</span>{isSignUp && <Link href="/sign-in">Sign in</Link>}</div>}
           <button className="auth-submit" disabled={loading} type="submit">{loading ? 'Please wait…' : isSignUp ? 'Create account' : 'Sign in'} <ArrowRight size={16} /></button>
         </form>
         <p className="auth-switch">{isSignUp ? 'Already have an account?' : 'New to AEGIS?'} <Link href={isSignUp ? '/sign-in' : '/sign-up'}>{isSignUp ? 'Sign in' : 'Create an account'}</Link></p>
