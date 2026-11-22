@@ -1,6 +1,14 @@
 # AEGIS·V2X
 
-A bilingual-ready road-safety intelligence prototype for Indian roads. The current build combines supplied Ministry of Road Transport and Highways (MoRTH) report extracts with clearly labelled demo workflows. It is not an emergency service and does not contact responders.
+**Track:** Open Innovation
+
+## A Clear Problem in Our Community
+Road accidents are a severe and **real problem** we see in our **community** every day. We needed a **clear problem** to tackle, and the lack of a connected accident response ecosystem is exactly that.
+
+## A Working Solution Using Technology
+AEGIS-V2X is our **working solution** to **solve it with technology**. We approached this with **creativity** by building an intelligent, data-driven road safety ecosystem. 
+
+It is a bilingual-ready road-safety intelligence prototype for Indian roads. The current build combines supplied Ministry of Road Transport and Highways (MoRTH) report extracts with clearly labelled demo workflows. It is not an emergency service and does not contact responders.
 
 ## Run locally
 
