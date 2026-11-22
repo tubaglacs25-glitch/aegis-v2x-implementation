@@ -41,7 +41,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" aria-label="AEGIS V2X Main Layout">
-      <body className={inter.className} role="main">
+     <body>
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
