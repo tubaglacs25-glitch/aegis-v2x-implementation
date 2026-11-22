@@ -25,7 +25,7 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
         ? await authClient.signUp.email({ email: email.trim(), password, name: name.trim() })
         : await authClient.signIn.email({ email: email.trim(), password })
       if (result.error) {
-        setError('Could not sign in. Check your email and password, or create an account if this is your first time.')
+        setError(isSignUp ? 'Could not create your account. Check the details, or sign in if you already registered.' : 'We couldn’t sign in with those details. If this is your first visit, create an account below; otherwise check your email and password.')
         return
       }
       router.replace('/')
