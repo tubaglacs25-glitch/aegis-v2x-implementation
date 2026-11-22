@@ -40,8 +40,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body className="antialiased">
+    <html lang="en" aria-label="AEGIS V2X Main Layout">
+      <body className={inter.className} role="main">
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
