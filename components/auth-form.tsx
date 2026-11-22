@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ArrowRight, ShieldCheck } from 'lucide-react'
+import { ArrowRight, Eye, EyeOff, ShieldCheck } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
 
 export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
@@ -11,6 +11,7 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const isSignUp = mode === 'sign-up'
@@ -24,7 +25,7 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
         ? await authClient.signUp.email({ email: email.trim(), password, name: name.trim() })
         : await authClient.signIn.email({ email: email.trim(), password })
       if (result.error) {
-        setError('We could not sign you in with those details. Check them and try again.')
+        setError('Could not sign in. Check your email and password, or create an account if this is your first time.')
         return
       }
       router.replace('/')
@@ -47,7 +48,7 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
         <form className="auth-form" onSubmit={handleSubmit}>
           {isSignUp && <label className="auth-field"><span>Full name</span><input value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" required maxLength={80} placeholder="Your name" /></label>}
           <label className="auth-field"><span>Email address</span><input type="email" value={email} onChange={(event) => setEmail(event.target.value)} autoComplete="email" required maxLength={254} placeholder="you@company.com" /></label>
-          <label className="auth-field"><span>Password</span><input type="password" value={password} onChange={(event) => setPassword(event.target.value)} autoComplete={isSignUp ? 'new-password' : 'current-password'} minLength={12} maxLength={128} required placeholder={isSignUp ? 'At least 12 characters' : 'Enter your password'} /></label>
+          <label className="auth-field"><span>Password</span><span className="auth-password-control"><input type={showPassword ? 'text' : 'password'} value={password} onChange={(event) => setPassword(event.target.value)} autoComplete={isSignUp ? 'new-password' : 'current-password'} minLength={isSignUp ? 8 : undefined} maxLength={128} required placeholder={isSignUp ? 'At least 8 characters' : 'Enter your password'} /><button className="auth-password-toggle" type="button" onClick={() => setShowPassword((visible) => !visible)} aria-label={showPassword ? 'Hide password' : 'Show password'} aria-pressed={showPassword}>{showPassword ? <EyeOff size={16} /> : <Eye size={16} />}</button></span></label>
           {error && <p className="auth-error" role="alert">{error}</p>}
           <button className="auth-submit" disabled={loading} type="submit">{loading ? 'Please wait…' : isSignUp ? 'Create account' : 'Sign in'} <ArrowRight size={16} /></button>
         </form>
