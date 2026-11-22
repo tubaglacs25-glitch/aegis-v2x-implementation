@@ -5,7 +5,7 @@ import './aegis.css'
 
 export const metadata: Metadata = {
   title: 'AEGIS·V2X — Intelligent Road Safety',
-  description: 'An intelligent road safety and emergency response ecosystem for safer journeys across India.',
+  description: 'Explore AEGIS·V2X road safety intelligence and evaluate project submissions across code quality, security, efficiency, testing, accessibility, and alignment.',
   generator: 'v0.app',
   icons: {
     icon: [
