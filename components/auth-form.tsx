@@ -45,6 +45,7 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
         <p className="auth-eyebrow">CONNECTED ROAD SAFETY</p>
         <h1 id="auth-title">{isSignUp ? 'Join the network.' : 'Welcome back.'}</h1>
         <p className="auth-description">{isSignUp ? 'Create your secure AEGIS command account.' : 'Sign in to your AEGIS command workspace.'}</p>
+        <Link href="/" className="auth-demo-link">Explore the full demo without signing in <ArrowRight size={15} /></Link>
         <form className="auth-form" onSubmit={handleSubmit}>
           {isSignUp && <label className="auth-field"><span>Full name</span><input value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" required maxLength={80} placeholder="Your name" /></label>}
           <label className="auth-field"><span>Email address</span><input type="email" value={email} onChange={(event) => setEmail(event.target.value)} autoComplete="email" required maxLength={254} placeholder="you@company.com" /></label>
