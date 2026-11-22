@@ -1,10 +1,11 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
+import './aegis.css'
 
 export const metadata: Metadata = {
-  title: 'AEGIS·V2X — Road Safety Intelligence',
-  description: 'Connected road intelligence, vehicle safety monitoring, and emergency response for Indian roads.',
+  title: 'AEGIS·V2X — Intelligent Road Safety',
+  description: 'An intelligent road safety and emergency response ecosystem for safer journeys across India.',
   generator: 'v0.app',
   icons: {
     icon: [

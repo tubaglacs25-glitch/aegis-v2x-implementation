@@ -1,0 +1,64 @@
+'use client'
+
+import { useState } from 'react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { ArrowRight, ShieldCheck } from 'lucide-react'
+import { authClient } from '@/lib/auth-client'
+
+export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
+  const router = useRouter()
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+  const isSignUp = mode === 'sign-up'
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setError(null)
+    setLoading(true)
+    try {
+      const result = isSignUp
+        ? await authClient.signUp.email({ email: email.trim(), password, name: name.trim() })
+        : await authClient.signIn.email({ email: email.trim(), password })
+      if (result.error) {
+        setError('We could not sign you in with those details. Check them and try again.')
+        return
+      }
+      router.replace('/')
+      router.refresh()
+    } catch {
+      setError('Sign-in is temporarily unavailable. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <main className="auth-screen">
+      <div className="auth-ambient" aria-hidden="true" />
+      <section className="auth-card" aria-labelledby="auth-title">
+        <Link href="/" className="auth-brand"><span className="auth-emblem">A</span><span>AEGIS<span>·</span>V2X</span></Link>
+        <p className="auth-eyebrow">CONNECTED ROAD SAFETY</p>
+        <h1 id="auth-title">{isSignUp ? 'Join the network.' : 'Welcome back.'}</h1>
+        <p className="auth-description">{isSignUp ? 'Create your secure AEGIS command account.' : 'Sign in to your AEGIS command workspace.'}</p>
+        <form className="auth-form" onSubmit={handleSubmit}>
+          {isSignUp && <label className="auth-field"><span>Full name</span><input value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" required maxLength={80} placeholder="Your name" /></label>}
+          <label className="auth-field"><span>Email address</span><input type="email" value={email} onChange={(event) => setEmail(event.target.value)} autoComplete="email" required maxLength={254} placeholder="you@company.com" /></label>
+          <label className="auth-field"><span>Password</span><input type="password" value={password} onChange={(event) => setPassword(event.target.value)} autoComplete={isSignUp ? 'new-password' : 'current-password'} minLength={12} maxLength={128} required placeholder={isSignUp ? 'At least 12 characters' : 'Enter your password'} /></label>
+          {error && <p className="auth-error" role="alert">{error}</p>}
+          <button className="auth-submit" disabled={loading} type="submit">{loading ? 'Please wait…' : isSignUp ? 'Create account' : 'Sign in'} <ArrowRight size={16} /></button>
+        </form>
+        <p className="auth-switch">{isSignUp ? 'Already have an account?' : 'New to AEGIS?'} <Link href={isSignUp ? '/sign-in' : '/sign-up'}>{isSignUp ? 'Sign in' : 'Create an account'}</Link></p>
+        <div className="auth-assurance"><ShieldCheck size={15} /><span>Protected with encrypted sessions</span></div>
+      </section>
+      <aside className="auth-story" aria-label="AEGIS road safety mission">
+        <div className="auth-story-mark"><div className="story-road"><i/><i/><i/></div><div className="story-signal signal-1"/><div className="story-signal signal-2"/><div className="story-signal signal-3"/></div>
+        <div><span className="auth-story-label">SEE THE RISK. CHANGE THE OUTCOME.</span><p>Every journey deserves<br/>a safer way forward.</p></div>
+        <span className="auth-story-foot">INTELLIGENT ROAD SAFETY & EMERGENCY RESPONSE</span>
+      </aside>
+    </main>
+  )
+}

@@ -1,7 +1,9 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { Activity, ArrowDownRight, ArrowUpRight, Bell, ChevronDown, CircleAlert, Clock3, Crosshair, HeartPulse, LayoutDashboard, MapPin, Moon, Navigation, Radio, Route, Shield, ShieldCheck, Siren, Sun, Truck, Wind } from 'lucide-react'
+import { Activity, ArrowDownRight, ArrowUpRight, Bell, ChevronDown, CircleAlert, Clock3, Crosshair, HeartPulse, LayoutDashboard, LogOut, MapPin, Moon, Navigation, Play, Radio, Route, Shield, ShieldCheck, Siren, Sun, Truck, Wind } from 'lucide-react'
+import { AegisIntro } from '@/components/aegis-intro'
+import { authClient } from '@/lib/auth-client'
 
 type Section = 'Overview' | 'Driver' | 'Authority' | 'Hospitals' | 'Analytics'
 const states = [
@@ -12,8 +14,9 @@ const trend = [{year:'20', accidents:372.181, fatalities:138.383},{year:'21',acc
 const nav: {name: Section, icon: typeof LayoutDashboard}[] = [{name:'Overview',icon:LayoutDashboard},{name:'Driver',icon:Navigation},{name:'Authority',icon:Radio},{name:'Hospitals',icon:HeartPulse},{name:'Analytics',icon:Activity}]
 const format = (n:number) => n.toLocaleString('en-IN')
 
-export function AegisDashboard() {
+export function AegisDashboard({ operatorName }: { operatorName: string }) {
   const [section,setSection] = useState<Section>('Overview')
+  const [introOpen,setIntroOpen] = useState(false)
   const [dark,setDark] = useState(false)
   const [locale,setLocale] = useState<'EN'|'हि'>('EN')
   const [incident,setIncident] = useState(false)
@@ -41,19 +44,19 @@ export function AegisDashboard() {
   const requestGPS=()=>navigator.geolocation?.getCurrentPosition(p=>{setGps([p.coords.latitude,p.coords.longitude]);setLocation('gps');setMessage('Current location updated from your device.')},()=>setMessage('Location permission unavailable. Showing clearly labelled demo location.'))
   const labels=locale==='EN'?{system:'ROAD SAFETY INTELLIGENCE', overview:'Overview', live:'LIVE SYSTEMS',title:'Good morning, operator.',sub:'Your road network at a glance. Stay ahead of risk.',accidents:'Reported accidents',fatalities:'Road fatalities',injuries:'People injured',coverage:'States & UTs covered',trend:'National road safety',trendSub:'Reported totals · 2020–2024',states:'Highest fatality burden',cities:'City snapshot',source:'Source: MoRTH annual report, 2024',sos:'Trigger demo SOS',safe:'I’m OK — cancel alert',route:'Plan a safer route'}:{system:'सड़क सुरक्षा इंटेलिजेंस',overview:'अवलोकन',live:'लाइव सिस्टम',title:'सुप्रभात, ऑपरेटर।',sub:'सड़क नेटवर्क का हाल। जोखिम से पहले तैयार रहें।',accidents:'दर्ज दुर्घटनाएं',fatalities:'सड़क दुर्घटना मृत्यु',injuries:'घायल लोग',coverage:'कवर किए गए राज्य',trend:'राष्ट्रीय सड़क सुरक्षा',trendSub:'दर्ज कुल · 2020–2024',states:'सबसे अधिक मृत्यु वाले राज्य',cities:'शहर की स्थिति',source:'स्रोत: MoRTH वार्षिक रिपोर्ट, 2024',sos:'डेमो SOS शुरू करें',safe:'मैं सुरक्षित हूं — रद्द करें',route:'सुरक्षित मार्ग देखें'}
   const avg=useMemo(()=>Math.round(states.reduce((a,b)=>a+b.killed,0)/states.length),[])
-  return <main className={dark?'app-shell dark':'app-shell'}>
+  return <>{introOpen&&<AegisIntro onFinish={()=>setIntroOpen(false)} />}<main className={dark?'app-shell dark':'app-shell'}>
     <aside className="sidebar">
       <div className="brand"><div className="brand-mark"><Shield size={23}/><span className="brand-road"/></div><div><strong>AEGIS<span>·</span>V2X</strong><small>CONNECTED ROAD SAFETY</small></div></div>
       <div className="workspace-label">WORKSPACE <ChevronDown size={13}/></div>
       <div className="network-card"><span className="pulse"/><div><b>National network</b><small>India · demo environment</small></div><span className="online-dot"/></div>
       <p className="nav-caption">OPERATIONS</p>
       <nav aria-label="Primary navigation">{nav.map(item=><button key={item.name} onClick={()=>setSection(item.name)} className={`nav-link ${section===item.name?'selected':''}`}><item.icon size={17}/><span>{item.name}</span>{item.name==='Hospitals'&&incident&&<i className="nav-notice"/>}</button>)}</nav>
-      <div className="sidebar-bottom"><div className="edge-mini"><div className="mini-icon"><Radio size={17}/></div><div><b>Edge network</b><small>12 simulated nodes</small></div><span className="status-live">●</span></div><div className="profile"><div className="avatar">OP</div><div><b>Demo operator</b><small>Safety command</small></div><ChevronDown size={15}/></div></div>
+      <div className="sidebar-bottom"><div className="edge-mini"><div className="mini-icon"><Radio size={17}/></div><div><b>Edge network</b><small>12 simulated nodes</small></div><span className="status-live">●</span></div><button className="profile sign-out-button" onClick={async()=>{try{await authClient.signOut();window.location.assign('/sign-in')}catch{setMessage('Sign out is temporarily unavailable. Please try again.')}}} aria-label={`Sign out ${operatorName}`}><div className="avatar">{operatorName.trim().split(/\s+/).slice(0,2).map(part=>part[0]).join('').toUpperCase()}</div><div><b>{operatorName}</b><small>Safety command</small></div><LogOut size={15}/></button></div>
     </aside>
     <section className="main-area">
       <header className="topbar"><div className="crumb"><span>AEGIS</span><span className="slash">/</span><b>{section}</b></div><div className="top-actions"><span className="system-live"><i/> All systems operational</span><button className="icon-button" aria-label="Notifications" onClick={()=>setMessage('No new platform notifications.')}><Bell size={17}/></button><button className="icon-button" aria-label="Toggle color theme" onClick={()=>setDark(!dark)}>{dark?<Sun size={17}/>:<Moon size={17}/>}</button><button className="lang-button" onClick={()=>setLocale(locale==='EN'?'हि':'EN')}>{locale} <ChevronDown size={13}/></button></div></header>
       <div className="page-content">
-        <div className="page-heading"><div><div className="eyebrow"><span className="eyebrow-line"/>{section==='Overview'?'SUNDAY, 22 NOVEMBER 2026':`AEGIS / ${section.toUpperCase()}`}</div><h1>{section==='Overview'?labels.title:section==='Driver'?'Driver command':section==='Authority'?'Authority desk':section==='Hospitals'?'Hospital response': 'National analytics'}</h1><p>{section==='Overview'?labels.sub:'One shared demo network · reported data and simulated events are clearly distinguished.'}</p></div><div className="heading-actions"><span className="period-select">2024 annual <ChevronDown size={14}/></span><button className="outline-button" onClick={()=>setMessage('Report prepared from the supplied MoRTH annual datasets.')}>Export report <ArrowDownRight size={15}/></button></div></div>
+        <div className="page-heading"><div><div className="eyebrow"><span className="eyebrow-line"/>{section==='Overview'?'SUNDAY, 22 NOVEMBER 2026':`AEGIS / ${section.toUpperCase()}`}</div><h1>{section==='Overview'?labels.title:section==='Driver'?'Driver command':section==='Authority'?'Authority desk':section==='Hospitals'?'Hospital response': 'National analytics'}</h1><p>{section==='Overview'?labels.sub:'One shared demo network · reported data and simulated events are clearly distinguished.'}</p></div><div className="heading-actions"><span className="period-select">2024 annual <ChevronDown size={14}/></span><button className="outline-button" onClick={()=>setIntroOpen(true)}><Play size={14}/> Replay intro</button><button className="outline-button" onClick={()=>setMessage('Report prepared from the supplied MoRTH annual datasets.')}>Export report <ArrowDownRight size={15}/></button></div></div>
         {message&&<div className="notice" role="status"><span>{message}</span><button onClick={()=>setMessage('')} aria-label="Dismiss">×</button></div>}
         {countdown!==null&&<div className="sos-banner" role="alert"><div className="sos-icon"><Siren size={20}/></div><div><b>Possible impact detected · simulated sensor event</b><p>Accident detected. Emergency alert will be sent in {countdown} seconds. Press I&apos;m OK if you are safe.</p></div><button onClick={()=>{setCountdown(null);setMessage('Alert cancelled and recorded in the demo event feed.')}}>{labels.safe}</button></div>}
         {incident&&<div className="incident-banner"><div className="incident-mark"><CircleAlert size={17}/></div><div><b>Incident AG-24-118 · Emergency alert generated</b><small>Simulated dispatch · {location==='gps'?'GPS location':'Demo location · New Delhi'} · Response teams not actually contacted</small></div><span className="incident-status">OPEN</span></div>}
@@ -75,6 +78,6 @@ export function AegisDashboard() {
         <footer className="page-footer"><div><span className="footer-brand">AEGIS·V2X</span><span>Road intelligence for safer journeys</span></div><span>{labels.source} · No live government feed connected</span></footer>
       </div>
     </section>
-  </main>
+  </main></>
 }
 function Metric({icon,label,value,delta,note,tone}:{icon:React.ReactNode,label:string,value:string,delta?:string,note:string,tone:string}){return <div className="metric-card"><div className="metric-top"><span className={`metric-icon ${tone}`}>{icon}</span>{delta&&<span className="metric-delta">{delta}</span>}</div><div className="metric-value">{value}</div><div className="metric-label">{label}</div><div className="metric-note">{note}</div></div>}
