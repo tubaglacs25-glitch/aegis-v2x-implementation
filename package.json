@@ -6,11 +6,17 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
     "test": "jest",
-  "lint": "next lint",
+    "lint": "next lint"
   },
-  "keywords": ["v2x", "road-safety", "accessibility", "a11y", "ai-evaluation"],
+  "keywords": [
+    "v2x",
+    "road-safety",
+    "accessibility",
+    "a11y",
+    "ai-evaluation"
+  ],
   "dependencies": {
     "@base-ui/react": "^1.5.0",
     "@vercel/analytics": "1.6.1",
